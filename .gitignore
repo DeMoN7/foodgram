@@ -9,7 +9,6 @@ __pycache__/
 # Distribution / packaging
 .Python
 build/
-.vscode
 develop-eggs/
 dist/
 downloads/
@@ -131,3 +130,6 @@ dmypy.json
 
 # .idea
 .idea
+util.py
+
+media/

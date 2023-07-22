@@ -1,41 +1,33 @@
+# flake8: noqa
 import os
 from pathlib import Path
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
 BASE_DIR = Path(__file__).resolve().parent.parent
+ 
+SECRET_KEY = os.getenv('SECRET_KEY', default='default_secret') 
+ 
+DEBUG = os.getenv('DEBUG', default='True') 
+ 
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='localhost').split(' ') 
 
-SECRET_KEY = os.getenv('SECRET_KEY', default='default_secret')
-
-DEBUG = os.getenv('DEBUG', default='True')
-
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='localhost').split(' ')
-
-
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'collected_static'
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / '/media/'
-
-# Application definition
+AUTH_USER_MODEL = 'users.User'
 
 INSTALLED_APPS = [
+    'users.apps.UsersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_filters',
-    'users.apps.UsersConfig',
-    'recipes.apps.RecipesConfig',
+    # installed apps:
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
-    'api.apps.ApiConfig',
+    'django_filters',
+
+    # my apps:
+    'recipes.apps.RecipesConfig',
 ]
 
 MIDDLEWARE = [
@@ -46,27 +38,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
-    ),
-    'DEFAULT_FILTER_BACKENDS': (
-        'django_filters.rest_framework.DjangoFilterBackend',
-    ),
-    'DEFAULT_PAGINATION_CLASS': 'api.paginations.CustomPagination',
-}
-
-AUTH_USER_MODEL = 'users.User'
-
-DJOSER = {
-    'LOGIN_FIELD': 'email',
-    'SEND_ACTIVATION_EMAIL': False,
-}
-
-
-ROOT_URLCONF = 'foodgram.urls'
+ROOT_URLCONF = 'foodgram_backend.urls'
 
 TEMPLATES = [
     {
@@ -84,32 +59,18 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'foodgram.wsgi.application'
-
-
-# Database
+WSGI_APPLICATION = 'foodgram_backend.wsgi.application'
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB', 'django'),
-        'USER': os.getenv('POSTGRES_USER', 'django'),
+        'NAME': os.getenv('POSTGRES_DB', 'food'),
+        'USER': os.getenv('POSTGRES_USER', 'postgres'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
         'HOST': os.getenv('DB_HOST', 'localhost'),
         'PORT': os.getenv('DB_PORT', 5432)
     }
 }
-
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
-
-# Password validation
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -126,19 +87,38 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-
 LANGUAGE_CODE = 'ru'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
-USE_L10N = True
-
 USE_TZ = True
 
-# Default primary key field type
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'collected_static')
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ),
+    'DEFAULT_PAGINATION_CLASS':
+        'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 6,
+}
+
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+}
+
+FILE_PATH = Path(BASE_DIR/ 'data/ingredients.json')
+FILE_PATH_TAGS = Path(BASE_DIR/ 'data/tags.json')
+FILE_PATH_USERS = Path(BASE_DIR/ 'data/users.json')
